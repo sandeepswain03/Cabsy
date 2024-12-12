@@ -120,7 +120,7 @@ const logoutUser = asyncHandler(async (req, res) => {
     return res
         .clearCookie("refreshToken", options)
         .clearCookie("accessToken", options)
-        .json(new apiResponse(200, null, "USer Logout Successfully", []));
+        .json(new apiResponse(200, null, "User Logout Successfully", []));
 });
 
 const getUserProfile = asyncHandler(async (req, res) => {

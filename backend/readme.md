@@ -1,5 +1,7 @@
 # Backend Api Documentation
 
+# User API
+---
 # `POST /user/register` Endpoint
 
 ## Description
@@ -52,6 +54,7 @@ The request body should be a JSON object containing the following fields:
   "password": "strongpassword123"
 }
 ```
+
 # `POST /user/logout` Endpoint
 
 ## Description
@@ -75,4 +78,21 @@ This endpoint requires the user to be authenticated. The user must be logged in,
   "message": "User Logout Successfully",
   "errors": []
 }
+```
+
+# `GET /user/getUserProfile` Endpoint
+
+## Description
+This endpoint allows the authenticated user to retrieve their profile information. The response will contain user details excluding sensitive information such as the password.
+
+## Authentication Required
+This endpoint requires the user to be authenticated. The user must provide a valid **JWT token** in the `Authorization` header, which will be used to identify the user.
+
+### Request Headers:
+- **Authorization**: `Bearer <access_token>`
+  - The JWT token of the user. This token must be valid and not expired.
+
+#### Example:
+```http
+Authorization: Bearer <access_token>
 ```
