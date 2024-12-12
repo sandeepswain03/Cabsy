@@ -80,18 +80,52 @@ const loginUser = asyncHandler(async (req, res) => {
         await generateAccessTokenandRefreshToken(user._id);
     const loggedInUser = await User.findById(user._id).select("-password");
 
-    return res.status(200).json(
-        new apiResponse(
-            200,
-            {
-                accessToken,
-                refreshToken,
-                loggedInUser
-            },
-            "Login Success",
-            []
-        )
-    );
+    const options = {
+        httpOnly: true,
+        secure: true,
+        sameSite: "None"
+    };
+
+    return res
+        .status(200)
+        .cookie("accessToken", accessToken, options)
+        .cookie("refreshToken", refreshToken, options)
+        .json(
+            new apiResponse(
+                200,
+                {
+                    accessToken,
+                    refreshToken,
+                    loggedInUser
+                },
+                "User Login Successfully",
+                []
+            )
+        );
 });
 
-export { registerUser, loginUser };
+const logoutUser = asyncHandler(async (req, res) => {
+    await User.findByIdAndUpdate(
+        req.user._id,
+        { refreshToken: null },
+        { new: true }
+    );
+
+    const options = {
+        httpOnly: true,
+        secure: true,
+        sameSite: "None"
+    };
+
+    return res
+        .clearCookie("refreshToken", options)
+        .clearCookie("accessToken", options)
+        .json(new apiResponse(200, null, "USer Logout Successfully", []));
+});
+
+const getUserProfile = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user._id).select("-password");
+    return res.json(new apiResponse(200, user, "User Profile", []));
+});
+
+export { registerUser, loginUser, logoutUser, getUserProfile };

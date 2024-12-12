@@ -36,7 +36,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-//importroutes
+//import routes
 import userRoutes from "./routes/user.route.js";
 
 //routes

@@ -52,3 +52,27 @@ The request body should be a JSON object containing the following fields:
   "password": "strongpassword123"
 }
 ```
+# `POST /user/logout` Endpoint
+
+## Description
+This endpoint logs out the user by clearing their **accessToken** and **refreshToken** cookies and removing the refresh token from the database.
+
+## Authentication Required
+This endpoint requires the user to be authenticated. The user must be logged in, with a valid JWT token provided in the `Authorization` header.
+
+## Response
+
+### Success (200 OK)
+- **Status Code**: `200 OK`
+- **Response Body**:
+  - A message indicating that the user has been successfully logged out.
+
+#### Example:
+```json
+{
+  "status": 200,
+  "data": null,
+  "message": "User Logout Successfully",
+  "errors": []
+}
+```
