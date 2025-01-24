@@ -177,7 +177,7 @@ const CaptainSignUp = () => {
                 <Input
                   type="text"
                   id="plate"
-                  placeholder="Vehicle Plate Number"
+                  placeholder="Vehicle Plate"
                   {...register("vehicle.plate")}
                   className="flex-1 px-3 py-2 focus:outline-none text-gray-600 border border-gray-300 rounded-lg"
                 />
@@ -200,7 +200,7 @@ const CaptainSignUp = () => {
                 <Input
                   type="number"
                   id="capacity"
-                  placeholder="Passenger Capacity"
+                  placeholder="Capacity"
                   {...register("vehicle.capacity", {
                     setValueAs: (v) => (v === "" ? undefined : parseInt(v, 10)),
                   })}
@@ -223,7 +223,7 @@ const CaptainSignUp = () => {
                 <Input
                   type="text"
                   id="vehicleType"
-                  placeholder="Car/Van/Bike"
+                  placeholder="car / auto / motorcycle"
                   {...register("vehicle.vehicleType")}
                   className="flex-1 px-3 py-2 focus:outline-none text-gray-600 border border-gray-300 rounded-lg"
                 />
@@ -245,7 +245,7 @@ const CaptainSignUp = () => {
         </form>
 
         <p className="text-center text-sm text-gray-600 mt-2">
-          <Link to="/sign-in" className="hover:underline">
+          <Link to="/captain-sign-in" className="hover:underline">
             Already have an account?{" "}
             <span className="text-blue-500">Log In</span>
           </Link>

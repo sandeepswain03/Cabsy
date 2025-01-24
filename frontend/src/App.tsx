@@ -1,3 +1,5 @@
+// import { useContext } from "react";
+// import { UserContext } from "./context/UserContext";
 import {
   Navigate,
   Route,
@@ -13,7 +15,8 @@ import Index from "./pages/Index/Index";
 import Home from "./pages/Home/Home";
 
 function App() {
-  const isAuthenticated = sessionStorage.getItem("isAuthenticated") == "true";
+  // const isAuthenticated = useContext(UserContext);
+  const isAuthenticated = false;
 
   return (
     <Router>
