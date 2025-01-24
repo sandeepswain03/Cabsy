@@ -7,8 +7,10 @@ import {
 import Container from "./components/Container/Container";
 import UserSignIn from "./pages/Sign-In/UserSignIn";
 import CaptainSignIn from "./pages/Sign-In/CaptainSignIn";
-import Home from "./pages/Home/Home";
+import UserSignUp from "./pages/Sign-Up/UserSignUp";
+import CaptainSignUp from "./pages/Sign-Up/CaptainSignUp";
 import Index from "./pages/Index/Index";
+import Home from "./pages/Home/Home";
 
 function App() {
   const isAuthenticated = sessionStorage.getItem("isAuthenticated") == "true";
@@ -42,6 +44,30 @@ function App() {
             !isAuthenticated ? (
               <Container>
                 <CaptainSignIn />
+              </Container>
+            ) : (
+              <Navigate to="/home" />
+            )
+          }
+        />
+        <Route
+          path="/sign-up"
+          element={
+            !isAuthenticated ? (
+              <Container>
+                <UserSignUp />
+              </Container>
+            ) : (
+              <Navigate to="/home" />
+            )
+          }
+        />
+        <Route
+          path="/captain-sign-up"
+          element={
+            !isAuthenticated ? (
+              <Container>
+                <CaptainSignUp />
               </Container>
             ) : (
               <Navigate to="/home" />

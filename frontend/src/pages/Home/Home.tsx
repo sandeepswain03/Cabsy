@@ -1,27 +1,9 @@
-import Container from "@/components/Container/Container";
-import Coupon from "@/components/Coupon/Coupon";
-import CouponRequest from "@/components/CouponRequest/CouponRequest";
-import Navbar from "@/components/Navbar/Navbar";
-import ServiceRequest from "@/components/ServiceRequest/ServiceRequest";
-import Status from "@/components/Status/Status";
-import Story from "@/components/Story/Story";
+import React from 'react'
 
-const Home = () => {
+function Home() {
   return (
-    <div>
-      <Container>
-        <Navbar />
-      </Container>
-      <Container>
-        <Status />
-      </Container>
-      <Coupon />
+    <div>Home</div>
+  )
+}
 
-      <CouponRequest />
-      <ServiceRequest />
-      <Story />
-    </div>
-  );
-};
-
-export default Home;
+export default Home

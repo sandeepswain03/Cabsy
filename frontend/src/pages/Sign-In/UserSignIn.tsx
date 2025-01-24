@@ -52,8 +52,8 @@ const UserSignIn = () => {
       </div>
 
       <div className="flex flex-col items-center">
-        <h1 className="text-2xl font-extrabold text-gray-800">Cabsy</h1>
-        <p className="text-gray-600 font-bold text-center">
+        <h1 className="text-4xl font-extrabold text-gray-800">Cabsy</h1>
+        <p className="text-gray-600 text-sm text-center">
           User Login
         </p>
       </div>
@@ -95,7 +95,7 @@ const UserSignIn = () => {
         </Button>
       </form>
       <p className="text-center text-sm text-gray-600 mt-2">
-        <Link to="/terms" className="hover:underline">
+        <Link to="/sign-up" className="hover:underline">
           New here ? <span className="text-blue-500">Create new Account</span>
         </Link>
       </p>

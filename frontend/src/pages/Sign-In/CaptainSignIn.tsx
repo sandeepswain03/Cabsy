@@ -52,8 +52,8 @@ const CaptainSignIn = () => {
       </div>
 
       <div className="flex flex-col items-center">
-        <h1 className="text-2xl font-extrabold text-gray-800">Cabsy</h1>
-        <p className="text-gray-600 font-bold text-center">Captain Login</p>
+        <h1 className="text-4xl font-extrabold text-gray-800">Cabsy</h1>
+        <p className="text-gray-600 text-sm text-center">Captain Login</p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -93,11 +93,11 @@ const CaptainSignIn = () => {
         </Button>
       </form>
       <p className="text-center text-sm text-gray-600 mt-2">
-        <Link to="/terms" className="hover:underline">
+        <Link to="/captain-sign-up" className="hover:underline">
           New here ? <span className="text-blue-500">Create new Account</span>
         </Link>
       </p>
-      <p className="text-center text-gray-600">or</p>
+      <p className="text-center my-2 text-gray-600">or</p>
       <Link
         to="/sign-in"
         className="text-white py-2 my-2 rounded-lg font-medium bg-primary flex justify-center items-center"
