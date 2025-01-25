@@ -44,9 +44,9 @@ const UserSignUp = () => {
         password: data.password,
       });
       if (response.status === 201) {
-        const { user } = response.data.data;
+        const user = response.data.data;
         setUser(user);
-        navigate("/UserSignIn");
+        navigate("/sign-in");
       }
     } catch (error) {
       console.log(error);

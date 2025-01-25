@@ -33,15 +33,13 @@ const UserSignIn = () => {
         password: data.password,
       });
       if (response.status === 200) {
-        const { user } = response.data.data;
+        const user = response.data.data.loggedInUser;
         setUser(user);
         navigate("/home");
       }
     } catch (error) {
       console.log(error);
     }
-    // console.log("Form Submitted:", data);
-    // navigate("/home");
   };
 
   return (

@@ -8,6 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Link } from "react-router-dom";
 import * as z from "zod";
 import { axiosInstance } from "@/axiosInstance";
+import { useContext } from "react";
+import { CaptainContext } from "@/context/CaptainContext";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -18,25 +20,25 @@ type LoginFormInputs = z.infer<typeof loginSchema>;
 
 const CaptainSignIn = () => {
   const navigate = useNavigate();
+  const { setCaptain } = useContext(CaptainContext);
 
   const { register, handleSubmit } = useForm<LoginFormInputs>({
     resolver: zodResolver(loginSchema),
   });
 
-  const onSubmit =async (data: LoginFormInputs) => {
+  const onSubmit = async (data: LoginFormInputs) => {
     try {
       const response = await axiosInstance.post("/captain/login", {
         email: data.email,
         password: data.password,
       });
       if (response.status === 200) {
-        console.log("Form Submitted:", data);
-        navigate("/home");
-        
+        const captain = response.data.data.loggedInCaptain;
+        setCaptain(captain);
+        navigate("/captain-home");
       }
     } catch (error) {
       console.log(error);
-      
     }
   };
 

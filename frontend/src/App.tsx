@@ -1,12 +1,14 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import Container from "./components/Container/Container";
 import AuthLayout from "./components/AuthLayout";
+import CaptainAuthLayout from "./components/CaptainAuthLayout";
 import UserSignIn from "./pages/Sign-In/UserSignIn";
 import CaptainSignIn from "./pages/Sign-In/CaptainSignIn";
 import UserSignUp from "./pages/Sign-Up/UserSignUp";
 import CaptainSignUp from "./pages/Sign-Up/CaptainSignUp";
 import Index from "./pages/Index/Index";
 import Home from "./pages/Home/Home";
+import CaptainHome from "./pages/Home/CaptainHome";
 
 function App() {
   return (
@@ -14,11 +16,9 @@ function App() {
       <Route
         path="/"
         element={
-          <AuthLayout authentication={false}>
-            <Container>
-              <Index />
-            </Container>
-          </AuthLayout>
+          <Container>
+            <Index />
+          </Container>
         }
       />
       <Route
@@ -64,11 +64,31 @@ function App() {
       <Route
         path="/home"
         element={
-          <AuthLayout authentication={false}>
+          <AuthLayout authentication={true}>
             <Container>
               <Home />
             </Container>
           </AuthLayout>
+        }
+      />
+      <Route
+        path="/home"
+        element={
+          <AuthLayout authentication={true}>
+            <Container>
+              <Home />
+            </Container>
+          </AuthLayout>
+        }
+      />
+      <Route
+        path="/captain-home"
+        element={
+          <CaptainAuthLayout authentication={true}>
+            <Container>
+              <CaptainHome />
+            </Container>
+          </CaptainAuthLayout>
         }
       />
 

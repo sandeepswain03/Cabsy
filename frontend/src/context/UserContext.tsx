@@ -4,8 +4,11 @@ import { axiosInstance, setupAxiosInterceptors } from "../axiosInstance";
 
 interface User {
   id?: string;
-  name?: string;
-  // ... other user properties
+  fullname?: {
+    firstname: string;
+    lastname: string;
+  };
+  email?: string;
 }
 
 interface UserContextType {
@@ -28,7 +31,7 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
   const fetchCurrentUser = async () => {
     try {
       const response = await axiosInstance.get("/user/userprofile");
-      setUser(response.data.data.user);
+      setUser(response.data.data);
     } catch (error) {
       console.error("Error fetching current user:", error);
     } finally {
