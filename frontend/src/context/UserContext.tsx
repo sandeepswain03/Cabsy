@@ -1,13 +1,55 @@
-import { createContext, ReactNode } from "react";
+import { createContext, ReactNode, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { axiosInstance, setupAxiosInterceptors } from "../axiosInstance";
 
-const UserContext = createContext({});
+interface User {
+  id?: string;
+  name?: string;
+  // ... other user properties
+}
+
+interface UserContextType {
+  user: User | null;
+  setUser: (user: User | null) => void;
+  isLoading: boolean;
+}
+
+const UserContext = createContext<UserContextType>({
+  user: null,
+  setUser: () => {},
+  isLoading: false,
+});
 
 const UserContextProvider = ({ children }: { children: ReactNode }) => {
-  const user = "sandeep"
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
+
+  const fetchCurrentUser = async () => {
+    try {
+      const response = await axiosInstance.get("/user/userprofile");
+      setUser(response.data.data.user);
+    } catch (error) {
+      console.error("Error fetching current user:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const logoutCallback = () => {
+    setUser(null);
+    navigate("/sign-in");
+  };
+
+  useEffect(() => {
+    setupAxiosInterceptors(logoutCallback);
+    fetchCurrentUser();
+  }, []);
+
   return (
-    <div>
-      <UserContext.Provider value={user}>{children}</UserContext.Provider>
-    </div>
+    <UserContext.Provider value={{ user, setUser, isLoading }}>
+      {children}
+    </UserContext.Provider>
   );
 };
 

@@ -47,6 +47,6 @@ router.post(
     loginCaptain
 );
 router.post("/logout", checkAuth, logoutCaptain);
-router.get("/CaptainProfile", checkAuth, getCaptainProfile);
+router.get("/captainprofile", checkAuth, getCaptainProfile);
 
 export default router;

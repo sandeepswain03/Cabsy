@@ -7,6 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link } from "react-router-dom";
 import * as z from "zod";
+import { axiosInstance } from "../../axiosInstance";
+import { useContext } from "react";
+import { UserContext } from "@/context/UserContext";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -17,14 +20,28 @@ type LoginFormInputs = z.infer<typeof loginSchema>;
 
 const UserSignIn = () => {
   const navigate = useNavigate();
+  const { setUser } = useContext(UserContext);
 
   const { register, handleSubmit } = useForm<LoginFormInputs>({
     resolver: zodResolver(loginSchema),
   });
 
-  const onSubmit = (data: LoginFormInputs) => {
-    console.log("Form Submitted:", data);
-    navigate("/home");
+  const onSubmit = async (data: LoginFormInputs) => {
+    try {
+      const response = await axiosInstance.post("/user/login", {
+        email: data.email,
+        password: data.password,
+      });
+      if (response.status === 200) {
+        const { user } = response.data.data;
+        setUser(user);
+        navigate("/home");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    // console.log("Form Submitted:", data);
+    // navigate("/home");
   };
 
   return (
@@ -53,9 +70,7 @@ const UserSignIn = () => {
 
       <div className="flex flex-col items-center">
         <h1 className="text-4xl font-extrabold text-gray-800">Cabsy</h1>
-        <p className="text-gray-600 text-sm text-center">
-          User Login
-        </p>
+        <p className="text-gray-600 text-sm text-center">User Login</p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

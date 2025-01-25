@@ -6,7 +6,12 @@ import logger from "./utils/logger.js";
 import cookieParser from "cookie-parser";
 import apiError from "./utils/apiError.js";
 const app = express();
-app.use(cors());
+app.use(
+    cors({
+        origin: "http://localhost:5173",
+        credentials: true
+    })
+); 
 const morganFormat = ":method :url :status :response-time ms";
 app.use(
     morgan(morganFormat, {

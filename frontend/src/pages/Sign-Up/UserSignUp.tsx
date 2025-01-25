@@ -1,3 +1,4 @@
+import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -6,8 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link } from "react-router-dom";
 import * as z from "zod";
+import { axiosInstance } from "../../axiosInstance";
+import { UserContext } from "@/context/UserContext";
 
-// Updated Zod schema to match the desired output format
 const SignUpSchema = z.object({
   fullname: z.object({
     firstname: z.string().min(1, "First name is required"),
@@ -17,11 +19,11 @@ const SignUpSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
-// Type inference from the Zod schema
 type SignUpFormInputs = z.infer<typeof SignUpSchema>;
 
 const UserSignUp = () => {
   const navigate = useNavigate();
+  const { setUser } = useContext(UserContext);
 
   const {
     register,
@@ -31,10 +33,29 @@ const UserSignUp = () => {
     resolver: zodResolver(SignUpSchema),
   });
 
+  const handleUserSignup = async (data: SignUpFormInputs) => {
+    try {
+      const response = await axiosInstance.post("/user/register", {
+        fullname: {
+          firstname: data.fullname.firstname.toLowerCase(),
+          lastname: data.fullname.lastname.toLowerCase(),
+        },
+        email: data.email,
+        password: data.password,
+      });
+      if (response.status === 201) {
+        const { user } = response.data.data;
+        setUser(user);
+        navigate("/UserSignIn");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const onSubmit = (data: SignUpFormInputs) => {
     console.log("Form Submitted:", data);
-    // You can add your signup logic here
-    navigate("/sign-in");
+    handleUserSignup(data);
   };
 
   return (

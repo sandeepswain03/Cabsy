@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link } from "react-router-dom";
 import * as z from "zod";
+import { axiosInstance } from "@/axiosInstance";
 
 // Updated Zod schema to include vehicle details
 const CaptainSignUpSchema = z.object({
@@ -45,10 +46,30 @@ const CaptainSignUp = () => {
     },
   });
 
-  const onSubmit = (data: CaptainSignUpFormInputs) => {
-    console.log("Form Submitted:", data);
-    // You can add your signup logic here
-    navigate("/captain-sign-in");
+  const onSubmit = async (data: CaptainSignUpFormInputs) => {
+    try {
+      const response = await axiosInstance.post("/captain/register", {
+        fullname: {
+          firstname: data.fullname.firstname.toLowerCase(),
+          lastname: data.fullname.lastname.toLowerCase(),
+        },
+        email: data.email,
+        password: data.password,
+        vehicle: {
+          color: data.vehicle.color,
+          plate: data.vehicle.plate,
+          capacity: data.vehicle.capacity,
+          vehicleType: data.vehicle.vehicleType,
+        },
+      });
+      if (response.status === 201) {
+        console.log("Form Submitted:", data);
+        // You can add your signup logic here
+        navigate("/captain-sign-in");
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
