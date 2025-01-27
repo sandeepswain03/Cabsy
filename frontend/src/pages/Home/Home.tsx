@@ -10,7 +10,7 @@ import VehicleSelect from "@/components/Home/VehicleSelect";
 const Home = () => {
   const [panelOpen, setPanelOpen] = useState(false);
   const [vehiclePanel, setVehiclePanel] = useState(false);
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit, watch } = useForm();
 
   const onSubmit = (data) => {
     console.log(data);
@@ -23,6 +23,9 @@ const Home = () => {
   const handleVehiclePanelClose = () => {
     setVehiclePanel(false);
   };
+
+  const pickupLocation = watch("pickupLocation");
+  const destination = watch("destination");
 
   return (
     <div className="h-screen relative bg-gray-50">
@@ -90,24 +93,43 @@ const Home = () => {
                 )}
               </AnimatePresence>
             </div>
-
             <form onSubmit={handleSubmit(onSubmit)} className="relative py-2">
-              <div className="absolute h-16 w-1 top-[50%] -translate-y-1/2 left-5 bg-gray-900 rounded-full" />
-              <div className="space-y-4">
-                <Input
-                  className="bg-gray-100 px-12 py-2 text-base rounded-lg w-full focus:ring-2 focus:ring-primary"
-                  onClick={() => setPanelOpen(true)}
-                  type="text"
-                  placeholder="Enter Pick-up Location"
-                  {...register("pickupLocation")}
-                />
-                <Input
-                  className="bg-gray-100 px-12 py-2 text-base rounded-lg w-full focus:ring-2 focus:ring-primary"
-                  onClick={() => setPanelOpen(true)}
-                  type="text"
-                  placeholder="Enter Destination"
-                  {...register("destination")}
-                />
+              <div className="absolute h-12 w-0.5 top-[50%] left-[5%] -translate-y-1/2 bg-gray-900 rounded-full z-10" />
+              <div className="space-y-6">
+                <div className="relative flex items-center">
+                  <div className="absolute left-3">
+                    <div
+                      className={`h-3 w-3 rounded-full ${
+                        pickupLocation
+                          ? "bg-gray-900"
+                          : "border-2 border-gray-900"
+                      }`}
+                    />
+                  </div>
+                  <Input
+                    className="pl-10 py-3 bg-gray-50 border-gray-200 rounded-lg w-full hover:bg-gray-100 transition-colors"
+                    onClick={() => setPanelOpen(true)}
+                    type="text"
+                    placeholder="Enter Pick-up Location"
+                    {...register("pickupLocation")}
+                  />
+                </div>
+                <div className="relative flex items-center">
+                  <div className="absolute left-3">
+                    <div
+                      className={`h-3 w-3 rounded-sm ${
+                        destination ? "bg-gray-900" : "border-2 border-gray-900"
+                      }`}
+                    />
+                  </div>
+                  <Input
+                    className="pl-10 py-3 bg-gray-50 border-gray-200 rounded-lg w-full hover:bg-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                    onClick={() => setPanelOpen(true)}
+                    type="text"
+                    placeholder="Enter Destination"
+                    {...register("destination")}
+                  />
+                </div>
               </div>
             </form>
           </div>

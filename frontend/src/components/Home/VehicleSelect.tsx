@@ -54,7 +54,7 @@ const VehicleSelect: React.FC<VehicleSelectProps> = ({ isOpen, onClose }) => {
           className="absolute -top-8 left-1/2 -translate-x-1/2 p-2 hover:bg-gray-50 rounded-full transition-colors"
           onClick={onClose}
         >
-          <ArrowDown className="w-6 h-6 text-gray-900" />
+          <ArrowDown className="w-6 h-6 text-gray-400" />
         </button>
 
         <h3 className="text-2xl font-semibold mb-6 mt-3">Choose a Vehicle</h3>
