@@ -1,16 +1,24 @@
+import { useState } from "react";
 import { homemap } from "@/assets/map";
 import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowDown } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import LocationSearch from "@/components/Home/LocationSearch";
 import VehicleSelect from "@/components/Home/VehicleSelect";
+import ConfirmedVehicle from "@/components/Home/ConfirmedVehicle";
+import LookingForDriver from "@/components/Home/LookingForDriver";
+import DriverConfirmed from "@/components/Home/DriverConfirmed";
 
 const Home = () => {
   const [panelOpen, setPanelOpen] = useState(false);
   const [vehiclePanel, setVehiclePanel] = useState(false);
+  const [selectedVehicle, setSelectedVehicle] = useState(null);
+  const [lookingForDriver, setLookingForDriver] = useState(false);
+  const [driverConfirmed, setDriverConfirmed] = useState(false);
   const { register, handleSubmit, watch } = useForm();
+  const navigate = useNavigate();
 
   const onSubmit = (data) => {
     console.log(data);
@@ -24,6 +32,34 @@ const Home = () => {
     setVehiclePanel(false);
   };
 
+  const handleVehicleSelect = (vehicle) => {
+    setSelectedVehicle(vehicle);
+    setVehiclePanel(false);
+  };
+
+  const handleConfirmedVehicleClose = () => {
+    setSelectedVehicle(null);
+  };
+
+  const handleConfirmRide = () => {
+    setSelectedVehicle(null);
+    setLookingForDriver(true);
+  };
+
+  const handleDriverFound = () => {
+    setLookingForDriver(false);
+    setDriverConfirmed(true);
+  };
+
+  const handleCancelLookingForDriver = () => {
+    setLookingForDriver(false);
+  };
+
+  const handleTrackRide = () => {
+    console.log("Tracking ride...");
+    navigate("/riding");
+  };
+
   const pickupLocation = watch("pickupLocation");
   const destination = watch("destination");
 
@@ -35,7 +71,7 @@ const Home = () => {
 
       <div className="h-screen w-screen overflow-hidden">
         <img
-          src={homemap}
+          src={homemap || "/placeholder.svg"}
           alt="homemap"
           className="h-full w-full object-cover"
         />
@@ -143,7 +179,35 @@ const Home = () => {
         </motion.div>
       </motion.div>
 
-      <VehicleSelect isOpen={vehiclePanel} onClose={handleVehiclePanelClose} />
+      <VehicleSelect
+        isOpen={vehiclePanel}
+        onClose={handleVehiclePanelClose}
+        onSelectVehicle={handleVehicleSelect}
+      />
+
+      <AnimatePresence>
+        {selectedVehicle && (
+          <ConfirmedVehicle
+            vehicle={selectedVehicle}
+            onClose={handleConfirmedVehicleClose}
+            onConfirmRide={handleConfirmRide}
+          />
+        )}
+        {lookingForDriver && (
+          <LookingForDriver
+            onClose={handleCancelLookingForDriver}
+            onDriverFound={handleDriverFound}
+          />
+        )}
+        {driverConfirmed && (
+          <DriverConfirmed
+            driverName="John Doe"
+            vehicleName={selectedVehicle?.name || "car"}
+            vehicleImage={selectedVehicle?.image || "/placeholder.svg"}
+            onTrackRide={handleTrackRide}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };

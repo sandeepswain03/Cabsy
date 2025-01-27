@@ -8,6 +8,7 @@ import UserSignUp from "./pages/Sign-Up/UserSignUp";
 import CaptainSignUp from "./pages/Sign-Up/CaptainSignUp";
 import Index from "./pages/Index/Index";
 import Home from "./pages/Home/Home";
+import Riding from "./pages/Riding/Riding";
 import CaptainHome from "./pages/Home/CaptainHome";
 
 function App() {
@@ -66,6 +67,14 @@ function App() {
         element={
           <AuthLayout authentication={true}>
             <Home />
+          </AuthLayout>
+        }
+      />
+      <Route
+        path="/riding"
+        element={
+          <AuthLayout authentication={true}>
+            <Riding />
           </AuthLayout>
         }
       />
