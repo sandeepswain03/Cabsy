@@ -65,19 +65,7 @@ function App() {
         path="/home"
         element={
           <AuthLayout authentication={true}>
-            <Container>
-              <Home />
-            </Container>
-          </AuthLayout>
-        }
-      />
-      <Route
-        path="/home"
-        element={
-          <AuthLayout authentication={true}>
-            <Container>
-              <Home />
-            </Container>
+            <Home />
           </AuthLayout>
         }
       />

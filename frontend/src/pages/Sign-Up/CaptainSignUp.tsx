@@ -7,8 +7,6 @@ import { Label } from "@/components/ui/label";
 import { Link } from "react-router-dom";
 import * as z from "zod";
 import { axiosInstance } from "@/axiosInstance";
-import { CaptainContext } from "@/context/CaptainContext";
-import { useContext } from "react";
 
 // Updated Zod schema to include vehicle details
 const CaptainSignUpSchema = z.object({
@@ -33,7 +31,6 @@ type CaptainSignUpFormInputs = z.infer<typeof CaptainSignUpSchema>;
 
 const CaptainSignUp = () => {
   const navigate = useNavigate();
-  const { setCaptain } = useContext(CaptainContext);
 
   const {
     register,
@@ -66,8 +63,6 @@ const CaptainSignUp = () => {
         },
       });
       if (response.status === 201) {
-        const captain = response.data.data;
-        setCaptain(captain);
         navigate("/captain-sign-in");
       }
     } catch (error) {

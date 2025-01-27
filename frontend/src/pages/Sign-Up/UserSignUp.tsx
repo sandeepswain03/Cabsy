@@ -1,4 +1,3 @@
-import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,7 +7,6 @@ import { Label } from "@/components/ui/label";
 import { Link } from "react-router-dom";
 import * as z from "zod";
 import { axiosInstance } from "../../axiosInstance";
-import { UserContext } from "@/context/UserContext";
 
 const SignUpSchema = z.object({
   fullname: z.object({
@@ -23,7 +21,6 @@ type SignUpFormInputs = z.infer<typeof SignUpSchema>;
 
 const UserSignUp = () => {
   const navigate = useNavigate();
-  const { setUser } = useContext(UserContext);
 
   const {
     register,
@@ -44,8 +41,6 @@ const UserSignUp = () => {
         password: data.password,
       });
       if (response.status === 201) {
-        const user = response.data.data;
-        setUser(user);
         navigate("/sign-in");
       }
     } catch (error) {
@@ -54,7 +49,6 @@ const UserSignUp = () => {
   };
 
   const onSubmit = (data: SignUpFormInputs) => {
-    console.log("Form Submitted:", data);
     handleUserSignup(data);
   };
 
