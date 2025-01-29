@@ -10,6 +10,7 @@ import Index from "./pages/Index/Index";
 import Home from "./pages/Home/Home";
 import Riding from "./pages/Riding/Riding";
 import CaptainHome from "./pages/Home/CaptainHome";
+import CaptainRiding from "./pages/Riding/CaptainRiding";
 
 function App() {
   return (
@@ -82,9 +83,15 @@ function App() {
         path="/captain-home"
         element={
           <CaptainAuthLayout authentication={true}>
-            <Container>
-              <CaptainHome />
-            </Container>
+            <CaptainHome />
+          </CaptainAuthLayout>
+        }
+      />
+      <Route
+        path="/captain-riding"
+        element={
+          <CaptainAuthLayout authentication={true}>
+            <CaptainRiding />
           </CaptainAuthLayout>
         }
       />
