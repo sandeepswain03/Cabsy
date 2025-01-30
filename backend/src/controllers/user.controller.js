@@ -3,23 +3,7 @@ import asyncHandler from "../utils/asyncHandler.js";
 import apiResponse from "../utils/apiResponse.js";
 import { validationResult } from "express-validator";
 import { User } from "../models/user.model.js";
-
-const generateAccessTokenandRefreshToken = async (userId) => {
-    try {
-        const user = await User.findById(userId);
-        const accessToken = user.generateAccessToken();
-        const refreshToken = user.generateRefreshToken();
-
-        user.refreshToken = refreshToken;
-        await user.save({ validateBeforeSave: false });
-        return {
-            accessToken,
-            refreshToken
-        };
-    } catch (error) {
-        throw new apiError(500, "Error generating tokens");
-    }
-};
+import { generateAccessTokenandRefreshToken } from "../services/user.service.js";
 
 const registerUser = asyncHandler(async (req, res) => {
     const errors = validationResult(req);

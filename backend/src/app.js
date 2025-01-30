@@ -11,7 +11,7 @@ app.use(
         origin: "http://localhost:5173",
         credentials: true
     })
-); 
+);
 const morganFormat = ":method :url :status :response-time ms";
 app.use(
     morgan(morganFormat, {
@@ -44,10 +44,12 @@ app.use(cookieParser());
 //import routes
 import userRoutes from "./routes/user.route.js";
 import captainRoutes from "./routes/captain.route.js";
+import mapRoutes from "./routes/map.route.js";
 
 //routes
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/captain", captainRoutes);
+app.use("/api/v1/map", mapRoutes);
 
 app.use((err, req, res, next) => {
     // Check if it's an instance of your custom ApiError
