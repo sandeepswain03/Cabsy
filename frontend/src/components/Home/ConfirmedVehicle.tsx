@@ -15,12 +15,22 @@ interface Vehicle {
 
 interface ConfirmedVehicleProps {
   vehicle: Vehicle;
+  pickup: string;
+  destination: string;
+  fare: {
+    auto: number;
+    car: number;
+    motorcycle: number;
+  };
   onClose: () => void;
   onConfirmRide: () => void;
 }
 
 const ConfirmedVehicle: React.FC<ConfirmedVehicleProps> = ({
   vehicle,
+  fare,
+  pickup,
+  destination,
   onClose,
   onConfirmRide,
 }) => {
@@ -45,24 +55,24 @@ const ConfirmedVehicle: React.FC<ConfirmedVehicleProps> = ({
         />
         <div>
           <h4 className="font-medium text-lg">{vehicle.name}</h4>
-          <p className="text-sm text-gray-600">{vehicle.description}</p>
+          <p className="flex flex-center items-center gap-1">
+            <UserRound className="w-4 h-4 mr-1" />
+            <p className="text-sm text-gray-600">{vehicle.capacity}</p>
+          </p>
         </div>
       </div>
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div>
-          <p className="text-sm text-gray-600">Capacity</p>
-          <p className="font-medium flex items-center">
-            <UserRound className="w-4 h-4 mr-1" />
-            {vehicle.capacity}
-          </p>
+          <p className="text-sm text-gray-600">Pickup</p>
+          <p className="font-medium">{pickup}</p>
         </div>
         <div>
-          <p className="text-sm text-gray-600">ETA</p>
-          <p className="font-medium">{vehicle.eta}</p>
+          <p className="text-sm text-gray-600">Destination</p>
+          <p className="font-medium">{destination}</p>
         </div>
         <div>
           <p className="text-sm text-gray-600">Price</p>
-          <p className="font-medium">₹{vehicle.price}</p>
+          <p className="font-medium">₹{fare[vehicle.type]}</p>
         </div>
       </div>
       <Button onClick={onConfirmRide} className="w-full text-white">

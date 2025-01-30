@@ -1,7 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { homemap } from "@/assets/map";
 import { useForm } from "react-hook-form";
-import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -10,58 +9,87 @@ import VehicleSelect from "@/components/Home/VehicleSelect";
 import ConfirmedVehicle from "@/components/Home/ConfirmedVehicle";
 import LookingForDriver from "@/components/Home/LookingForDriver";
 import DriverConfirmed from "@/components/Home/DriverConfirmed";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { axiosInstance } from "@/axiosInstance";
+
+interface FormInputs {
+  pickupLocation: string;
+  destination: string;
+}
 
 const Home = () => {
   const [panelOpen, setPanelOpen] = useState(false);
   const [vehiclePanel, setVehiclePanel] = useState(false);
-  const [selectedVehicle, setSelectedVehicle] = useState(null);
+  const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
   const [lookingForDriver, setLookingForDriver] = useState(false);
   const [driverConfirmed, setDriverConfirmed] = useState(false);
-  const { register, handleSubmit, watch } = useForm();
+  const [pickupSuggestions, setPickupSuggestions] = useState<string[]>([]);
+  const [destinationSuggestions, setDestinationSuggestions] = useState<string[]>([]);
+  const [activeField, setActiveField] = useState<'pickup' | 'destination' | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [fare, setFare] = useState({});
+
+  const { watch, setValue } = useForm<FormInputs>();
   const navigate = useNavigate();
-
-  const onSubmit = (data) => {
-    console.log(data);
-  };
-
-  const handlePanelToggle = () => {
-    setPanelOpen(!panelOpen);
-  };
-
-  const handleVehiclePanelClose = () => {
-    setVehiclePanel(false);
-  };
-
-  const handleVehicleSelect = (vehicle) => {
-    setSelectedVehicle(vehicle);
-    setVehiclePanel(false);
-  };
-
-  const handleConfirmedVehicleClose = () => {
-    setSelectedVehicle(null);
-  };
-
-  const handleConfirmRide = () => {
-    setSelectedVehicle(null);
-    setLookingForDriver(true);
-  };
-
-  const handleDriverFound = () => {
-    setLookingForDriver(false);
-    setDriverConfirmed(true);
-  };
-
-  const handleCancelLookingForDriver = () => {
-    setLookingForDriver(false);
-  };
-
-  const handleTrackRide = () => {
-    console.log("Tracking ride...");
-    navigate("/riding");
-  };
 
   const pickupLocation = watch("pickupLocation");
   const destination = watch("destination");
+
+  useEffect(() => {
+    const fetchSuggestions = async () => {
+      if (!activeField) return;
+
+      const input = activeField === 'pickup' ? pickupLocation : destination;
+      if (!input || input.length < 3) {
+        if (activeField === 'pickup') {
+          setPickupSuggestions([]);
+        } else {
+          setDestinationSuggestions([]);
+        }
+        return;
+      }
+
+      setIsLoading(true);
+      try {
+        const response = await axiosInstance.get(`/map/get-suggestions?input=${encodeURIComponent(input)}`, {
+        });
+
+        const data = response.data.data;
+        if (activeField === 'pickup') {
+          setPickupSuggestions(data);
+        } else {
+          setDestinationSuggestions(data);
+        }
+      } catch (error) {
+        console.error('Error fetching suggestions:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    const debounceTimeout = setTimeout(fetchSuggestions, 300);
+    return () => clearTimeout(debounceTimeout);
+  }, [pickupLocation, destination, activeField]);
+
+  const findTrip = async () => {
+    if (pickupLocation && destination) {
+      setPanelOpen(false);
+      setVehiclePanel(true);
+    }
+
+    const response = await axiosInstance.get(`/riding/get-fare?pickup=${pickupLocation}&destination=${destination}`);
+    setFare(response.data.data);
+  };
+
+  const createRide = async () => {
+    const response = await axiosInstance.post(`/riding/create`, {
+      pickup: pickupLocation,
+      destination: destination,
+      vehicleType: selectedVehicle?.type
+    });
+    console.log(response.data.data);
+  }
 
   return (
     <div className="h-screen relative bg-gray-50">
@@ -71,14 +99,15 @@ const Home = () => {
 
       <div className="h-screen w-screen overflow-hidden">
         <img
-          src={homemap || "/placeholder.svg"}
-          alt="homemap"
+          src={homemap}
+          alt="map"
           className="h-full w-full object-cover"
         />
       </div>
 
       <motion.div
         className="flex flex-col justify-end h-screen w-full absolute top-0"
+        initial={false}
         animate={{
           top: panelOpen ? "0%" : "auto",
           bottom: panelOpen ? "auto" : "0%",
@@ -92,7 +121,7 @@ const Home = () => {
         <motion.div
           className="bg-white rounded-t-2xl flex flex-col shadow-lg"
           animate={{
-            height: panelOpen ? "100%" : "30%",
+            height: panelOpen ? "100%" : "auto",
           }}
           transition={{
             type: "spring",
@@ -101,102 +130,121 @@ const Home = () => {
           }}
         >
           <div className="p-5">
-            <div className="flex items-center justify-between mb-2">
-              <AnimatePresence mode="wait">
-                {!panelOpen && (
-                  <motion.h4
-                    className="text-2xl font-semibold"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                  >
-                    Find a trip
-                  </motion.h4>
-                )}
-                {panelOpen && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="flex items-center gap-2 cursor-pointer"
-                    onClick={handlePanelToggle}
-                  >
-                    <ArrowDown className="w-6 h-6" />
-                    <span className="text-xl font-semibold">
-                      Select location
-                    </span>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-            <form onSubmit={handleSubmit(onSubmit)} className="relative py-2">
-              <div className="absolute h-12 w-0.5 top-[50%] left-[5%] -translate-y-1/2 bg-gray-900 rounded-full z-10" />
+            {panelOpen && (
+              <div
+                className="flex items-center gap-2 cursor-pointer mb-4"
+                onClick={() => {
+                  setPanelOpen(false);
+                  setActiveField(null);
+                }}
+              >
+                <ArrowDown className="w-6 h-6" />
+                <span className="text-xl font-semibold">Back</span>
+              </div>
+            )}
+
+            <div className="relative py-2">
+              <div className="absolute h-12 w-0.5 top-[33%] left-[5%] -translate-y-1/2 bg-gray-900 rounded-full z-10" />
               <div className="space-y-6">
                 <div className="relative flex items-center">
                   <div className="absolute left-3">
                     <div
-                      className={`h-3 w-3 rounded-full ${
-                        pickupLocation
-                          ? "bg-gray-900"
-                          : "border-2 border-gray-900"
-                      }`}
+                      className={`h-3 w-3 rounded-full ${pickupLocation
+                        ? "bg-gray-900"
+                        : "border-2 border-gray-900"
+                        }`}
                     />
                   </div>
                   <Input
                     className="pl-10 py-3 bg-gray-50 border-gray-200 rounded-lg w-full hover:bg-gray-100 transition-colors"
-                    onClick={() => setPanelOpen(true)}
+                    onClick={() => {
+                      setPanelOpen(true);
+                      setActiveField('pickup');
+                    }}
+                    value={pickupLocation}
+                    onChange={(e) => setValue("pickupLocation", e.target.value)}
                     type="text"
                     placeholder="Enter Pick-up Location"
-                    {...register("pickupLocation")}
                   />
                 </div>
                 <div className="relative flex items-center">
                   <div className="absolute left-3">
                     <div
-                      className={`h-3 w-3 rounded-sm ${
-                        destination ? "bg-gray-900" : "border-2 border-gray-900"
-                      }`}
+                      className={`h-3 w-3 rounded-sm ${destination ? "bg-gray-900" : "border-2 border-gray-900"
+                        }`}
                     />
                   </div>
                   <Input
-                    className="pl-10 py-3 bg-gray-50 border-gray-200 rounded-lg w-full hover:bg-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                    onClick={() => setPanelOpen(true)}
+                    className="pl-10 py-3 bg-gray-50 border-gray-200 rounded-lg w-full hover:bg-gray-100 transition-colors"
+                    onClick={() => {
+                      setPanelOpen(true);
+                      setActiveField('destination');
+                    }}
+                    value={destination}
+                    onChange={(e) => setValue("destination", e.target.value)}
                     type="text"
                     placeholder="Enter Destination"
-                    {...register("destination")}
                   />
                 </div>
+                <Button
+                  onClick={findTrip}
+                  type="button"
+                  className="w-full bg-black text-white hover:bg-gray-800"
+                  disabled={!pickupLocation || !destination}
+                >
+                  Find Trip
+                </Button>
               </div>
-            </form>
+            </div>
           </div>
 
           {panelOpen && (
             <LocationSearch
-              setVehiclePanel={setVehiclePanel}
+              isLoading={isLoading}
               setPanelOpen={setPanelOpen}
+              setVehiclePanel={setVehiclePanel}
+              suggestions={activeField === 'pickup' ? pickupSuggestions : destinationSuggestions}
+              activeField={activeField}
+              setPickup={(value: string) => {
+                setValue("pickupLocation", value);
+              }}
+              setDestination={(value: string) => {
+                setValue("destination", value);
+              }}
             />
           )}
         </motion.div>
       </motion.div>
 
       <VehicleSelect
+        fare={fare}
         isOpen={vehiclePanel}
-        onClose={handleVehiclePanelClose}
-        onSelectVehicle={handleVehicleSelect}
+        onClose={() => setVehiclePanel(false)}
+        onSelectVehicle={setSelectedVehicle}
       />
 
       <AnimatePresence>
         {selectedVehicle && (
           <ConfirmedVehicle
+            pickup={pickupLocation}
+            destination={destination}
+            fare={fare}
             vehicle={selectedVehicle}
-            onClose={handleConfirmedVehicleClose}
-            onConfirmRide={handleConfirmRide}
+            onClose={() => setSelectedVehicle(null)}
+            onConfirmRide={() => {
+              setSelectedVehicle(null);
+              setLookingForDriver(true);
+              createRide();
+            }}
           />
         )}
         {lookingForDriver && (
           <LookingForDriver
-            onClose={handleCancelLookingForDriver}
-            onDriverFound={handleDriverFound}
+            onClose={() => setLookingForDriver(false)}
+            onDriverFound={() => {
+              setLookingForDriver(false);
+              setDriverConfirmed(true);
+            }}
           />
         )}
         {driverConfirmed && (
@@ -204,7 +252,7 @@ const Home = () => {
             driverName="John Doe"
             vehicleName={selectedVehicle?.name || "car"}
             vehicleImage={selectedVehicle?.image || "/placeholder.svg"}
-            onTrackRide={handleTrackRide}
+            onTrackRide={() => navigate("/riding")}
           />
         )}
       </AnimatePresence>

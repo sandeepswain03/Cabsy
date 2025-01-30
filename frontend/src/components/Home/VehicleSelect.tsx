@@ -10,7 +10,7 @@ const VEHICLES = [
     capacity: 4,
     eta: "2 mins away",
     description: "Affordable, compact rides",
-    price: "193.81",
+    type: "car"
   },
   {
     id: 2,
@@ -19,7 +19,7 @@ const VEHICLES = [
     capacity: 1,
     eta: "3 mins away",
     description: "Affordable motorcycle rides",
-    price: "119.00",
+    type: "motorcycle"
   },
   {
     id: 3,
@@ -28,18 +28,24 @@ const VEHICLES = [
     capacity: 3,
     eta: "3 mins away",
     description: "Affordable Auto rides",
-    price: "234.99",
+    type: "auto"
   },
 ];
 
 interface VehicleSelectProps {
   isOpen: boolean;
+  fare: {
+    auto: number;
+    car: number;
+    motorcycle: number;
+  };
   onClose: () => void;
   onSelectVehicle: (vehicle: (typeof VEHICLES)[0]) => void;
 }
 
 const VehicleSelect: React.FC<VehicleSelectProps> = ({
   isOpen,
+  fare,
   onClose,
   onSelectVehicle,
 }) => {
@@ -74,7 +80,10 @@ const VehicleSelect: React.FC<VehicleSelectProps> = ({
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3 }}
                 className="flex border-2 hover:border-black transition-colors rounded-xl p-3 items-center justify-between cursor-pointer"
-                onClick={() => onSelectVehicle(vehicle)}
+                onClick={() => {
+                  onSelectVehicle(vehicle);
+                  onClose();
+                }}
               >
                 <img
                   className="h-12 w-12 object-contain"
@@ -96,7 +105,7 @@ const VehicleSelect: React.FC<VehicleSelectProps> = ({
                   <p className="text-xs text-gray-600">{vehicle.description}</p>
                 </div>
 
-                <div className="text-lg font-semibold">₹{vehicle.price}</div>
+                <div className="text-lg font-semibold">₹{fare[vehicle.type]}</div>
               </motion.div>
             ))}
           </AnimatePresence>

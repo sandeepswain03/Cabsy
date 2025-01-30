@@ -61,7 +61,7 @@ const createRideService = async ({
     destination,
     vehicleType
 }) => {
-    const fare = await getFare(pickup, destination);
+    const fare = await getFareService(pickup, destination);
     const otp = await getOtp(6);
     const ride = Ride.create({
         user,

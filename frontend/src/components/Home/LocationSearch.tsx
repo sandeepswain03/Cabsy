@@ -1,88 +1,67 @@
+import React from "react";
 import { motion } from "framer-motion";
-import { MapPin } from "lucide-react";
-
-const LOCATIONS = [
-  {
-    id: 1,
-    address: "24B, Near Kapoor's cafe, Sheryians Coding School, Bhopal",
-  },
-  {
-    id: 2,
-    address: "15A, Lake View Road, Crystal Plaza Mall, Bhopal",
-  },
-  {
-    id: 3,
-    address: "42C, MP Nagar Zone 1, Behind City Mall, Bhopal",
-  },
-  {
-    id: 4,
-    address: "78D, Arera Colony, Near State Bank, Bhopal",
-  },
-  {
-    id: 5,
-    address: "56E, New Market, Opposite Central Library, Bhopal",
-  },
-  {
-    id: 6,
-    address: "91F, Shahpura Lake View, Pearl Heights, Bhopal",
-  },
-  {
-    id: 7,
-    address: "24B, Near Kapoor's cafe, Sheryians Coding School, Bhopal",
-  },
-  {
-    id: 8,
-    address: "15A, Lake View Road, Crystal Plaza Mall, Bhopal",
-  },
-  {
-    id: 9,
-    address: "42C, MP Nagar Zone 1, Behind City Mall, Bhopal",
-  },
-  {
-    id: 10,
-    address: "78D, Arera Colony, Near State Bank, Bhopal",
-  },
-  {
-    id: 11,
-    address: "56E, New Market, Opposite Central Library, Bhopal",
-  },
-  {
-    id: 12,
-    address: "91F, Shahpura Lake View, Pearl Heights, Bhopal",
-  },
-];
+import { MapPin, Loader2 } from "lucide-react";
 
 interface LocationSearchProps {
-  setVehiclePanel: (value: boolean) => void;
+  suggestions: {
+    description: string;
+  };
   setPanelOpen: (value: boolean) => void;
+  setVehiclePanel: (value: boolean) => void;
+  setPickup: (value: string) => void;
+  setDestination: (value: string) => void;
+  activeField: 'pickup' | 'destination' | null;
+  isLoading: boolean;
 }
 
-const LocationSearch: React.FC<LocationSearchProps> = ({ setVehiclePanel, setPanelOpen }) => {
+const LocationSearch: React.FC<LocationSearchProps> = ({
+  suggestions,
+  setPickup,
+  setDestination,
+  activeField,
+  isLoading
+}) => {
+  const handleSuggestionClick = (suggestion: string) => {
+    if (activeField === 'pickup') {
+      setPickup(suggestion);
+    } else if (activeField === 'destination') {
+      setDestination(suggestion);
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       className="flex-1 overflow-y-auto px-5"
     >
-      <div className="space-y-4">
-        {LOCATIONS.map((location) => (
-          <motion.div
-            onClick={() => {
-              setVehiclePanel(true);
-              setPanelOpen(false);
-            }}
-            key={location.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex items-center gap-2 p-2 active:bg-gray-50 rounded-lg cursor-pointer"
-          >
-            <div className="bg-[#eee] h-8 w-8 flex items-center justify-center rounded-full">
-              <MapPin className="w-4 h-4 text-primary" />
-            </div>
-            <h4 className="text-gray-900 flex-1">{location.address}</h4>
-          </motion.div>
-        ))}
-      </div>
+      {isLoading ? (
+        <div className="flex justify-center items-center py-4">
+          <Loader2 className="w-6 h-6 animate-spin text-gray-500" />
+        </div>
+      ) : suggestions.length > 0 ? (
+        <div className="space-y-4">
+          {suggestions.map((location, index) => (
+            <motion.div
+              onClick={() => handleSuggestionClick(location.description)}
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05 }}
+              className="flex items-center gap-2 p-2 hover:bg-gray-50 active:bg-gray-100 rounded-lg cursor-pointer"
+            >
+              <div className="bg-gray-100 h-8 w-8 flex items-center justify-center rounded-full">
+                <MapPin className="w-4 h-4 text-gray-900" />
+              </div>
+              <h4 className="text-gray-900 flex-1">{location.description}</h4>
+            </motion.div>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-4 text-gray-500">
+          {activeField && 'Type at least 3 characters to see suggestions'}
+        </div>
+      )}
     </motion.div>
   );
 };

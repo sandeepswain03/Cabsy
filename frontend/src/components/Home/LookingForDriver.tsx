@@ -15,7 +15,7 @@ const LookingForDriver: React.FC<LookingForDriverProps> = ({
   useEffect(() => {
     const timer = setTimeout(() => {
       onDriverFound();
-    }, 5000); // Simulate finding a driver after 5 seconds
+    }, 5000);
 
     return () => clearTimeout(timer);
   }, [onDriverFound]);
