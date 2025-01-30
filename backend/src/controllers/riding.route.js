@@ -2,9 +2,15 @@ import apiError from "../utils/apiError.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import apiResponse from "../utils/apiResponse.js";
 import { validationResult } from "express-validator";
-import { createRide, getFare, confirmRide, startRide, endRide } from "../services/riding.service.js";
+// import { sendMessageToSocketId } from "../utils/socket.js";
 import { Ride } from "../models/ride.modal.js";
-import { sendMessageToSocketId } from "../utils/socket.js";
+import {
+    createRideService,
+    getFareService,
+    confirmRideService,
+    startRideService,
+    endRideService
+} from "../services/riding.service.js";
 import {
     getAddressCoordinates,
     getcaptainInRadius
@@ -23,7 +29,7 @@ const createRide = asyncHandler(async (req, res) => {
     }
 
     try {
-        const ride = await createRide({
+        const ride = await createRideService({
             user: req.user._id,
             pickup,
             destination,
@@ -38,14 +44,16 @@ const createRide = asyncHandler(async (req, res) => {
             2
         );
         ride.otp = "";
-        const rideWithUser = await Ride.findOne({ _id: ride._id }).populate("user");
+        const rideWithUser = await Ride.findOne({ _id: ride._id }).populate(
+            "user"
+        );
 
-        captainInRadius.map((captain) => {
-            sendMessageToSocketId(captain.socketId, {
-                event: "new-ride",
-                data: rideWithUser
-            });
-        });
+        // captainInRadius.map((captain) => {
+        //     sendMessageToSocketId(captain.socketId, {
+        //         event: "new-ride",
+        //         data: rideWithUser
+        //     });
+        // });
     } catch (error) {
         throw new apiError(500, error.message || "Error creating ride");
     }
@@ -60,8 +68,10 @@ const getFare = asyncHandler(async (req, res) => {
     const { pickup, destination } = req.query;
 
     try {
-        const fare = await getFare(pickup, destination);
-        return res.json(new apiResponse(200, fare, "Fare calculated successfully", []));
+        const fare = await getFareService(pickup, destination);
+        return res.json(
+            new apiResponse(200, fare, "Fare calculated successfully", [])
+        );
     } catch (error) {
         throw new apiError(500, error.message || "Error calculating fare");
     }
@@ -76,14 +86,16 @@ const confirmRide = asyncHandler(async (req, res) => {
     const { rideId } = req.body;
 
     try {
-        const ride = await confirmRide({ rideId, captain: req.captain });
+        const ride = await confirmRideService({ rideId, captain: req.captain });
 
-        sendMessageToSocketId(ride.user.socketId, {
-            event: "ride-confirmed",
-            data: ride
-        });
+        // sendMessageToSocketId(ride.user.socketId, {
+        //     event: "ride-confirmed",
+        //     data: ride
+        // });
 
-        return res.json(new apiResponse(200, ride, "Ride confirmed successfully", []));
+        return res.json(
+            new apiResponse(200, ride, "Ride confirmed successfully", [])
+        );
     } catch (error) {
         throw new apiError(500, error.message || "Error confirming ride");
     }
@@ -98,14 +110,20 @@ const startRide = asyncHandler(async (req, res) => {
     const { rideId, otp } = req.query;
 
     try {
-        const ride = await startRide({ rideId, otp, captain: req.captain });
-
-        sendMessageToSocketId(ride.user.socketId, {
-            event: "ride-started",
-            data: ride
+        const ride = await startRideService({
+            rideId,
+            otp,
+            captain: req.captain
         });
 
-        return res.json(new apiResponse(200, ride, "Ride started successfully", []));
+        // sendMessageToSocketId(ride.user.socketId, {
+        //     event: "ride-started",
+        //     data: ride
+        // });
+
+        return res.json(
+            new apiResponse(200, ride, "Ride started successfully", [])
+        );
     } catch (error) {
         throw new apiError(500, error.message || "Error starting ride");
     }
@@ -120,14 +138,16 @@ const endRide = asyncHandler(async (req, res) => {
     const { rideId } = req.body;
 
     try {
-        const ride = await endRide({ rideId, captain: req.captain });
+        const ride = await endRideService({ rideId, captain: req.captain });
 
-        sendMessageToSocketId(ride.user.socketId, {
-            event: "ride-ended",
-            data: ride
-        });
+        // sendMessageToSocketId(ride.user.socketId, {
+        //     event: "ride-ended",
+        //     data: ride
+        // });
 
-        return res.json(new apiResponse(200, ride, "Ride ended successfully", []));
+        return res.json(
+            new apiResponse(200, ride, "Ride ended successfully", [])
+        );
     } catch (error) {
         throw new apiError(500, error.message || "Error ending ride");
     }

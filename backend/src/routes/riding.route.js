@@ -4,7 +4,7 @@ import {
     confirmRide,
     startRide,
     endRide
-} from "../controllers/riding.controller.js";
+} from "../controllers/riding.route.js";
 import { body, query } from "express-validator";
 import { Router } from "express";
 
@@ -24,7 +24,7 @@ router.post(
         .withMessage("Invalid destination address"),
     body("vehicleType")
         .isString()
-        .isIn(["auto", "car", "moto"])
+        .isIn(["auto", "car", "motorcycle"])
         .withMessage("Invalid vehicle type"),
     checkAuth,
     createRide

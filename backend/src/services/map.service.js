@@ -1,5 +1,5 @@
 import apiError from "../utils/apiError.js";
-import { Captain } from "../models/captain.modal.js";
+import { Captain } from "../models/captain.model.js";
 import axios from "axios";
 
 const getAddressCoordinates = async (address) => {

@@ -1,32 +1,37 @@
 import apiError from "../utils/apiError.js";
 import { Ride } from "../models/ride.modal.js";
-import { getDistanceTime } from "./map.service.js";
-import { bcrypt } from "bcrypt";
-import { crypto } from "crypto";
+import { getDistance } from "./map.service.js";
 
-const getFare = async (pickup, destination) => {
+const getOtp = async (length) => {
+    const min = Math.pow(10, length - 1);
+    const max = Math.pow(10, length);
+    const otp = Math.floor(Math.random() * (max - min) + min).toString();
+    return otp;
+};
+
+const getFareService = async (pickup, destination) => {
     if (!pickup || !destination) {
         throw new apiError(400, "All fields are required");
     }
 
-    const distanceTime = await getDistanceTime(pickup, destination);
+    const distanceTime = await getDistance(pickup, destination);
 
     const baseFare = {
         auto: 30,
         car: 50,
-        moto: 20
+        motorcycle: 20
     };
 
     const perKmRate = {
         auto: 10,
         car: 15,
-        moto: 8
+        motorcycle: 8
     };
 
     const perMinuteRate = {
         auto: 2,
         car: 3,
-        moto: 1.5
+        motorcycle: 1.5
     };
 
     const fare = {
@@ -40,24 +45,22 @@ const getFare = async (pickup, destination) => {
                 (distanceTime.distance.value / 1000) * perKmRate.car +
                 (distanceTime.duration.value / 60) * perMinuteRate.car
         ),
-        moto: Math.round(
-            baseFare.moto +
-                (distanceTime.distance.value / 1000) * perKmRate.moto +
-                (distanceTime.duration.value / 60) * perMinuteRate.moto
+        motorcycle: Math.round(
+            baseFare.motorcycle +
+                (distanceTime.distance.value / 1000) * perKmRate.motorcycle +
+                (distanceTime.duration.value / 60) * perMinuteRate.motorcycle
         )
     };
 
     return fare;
 };
 
-function getOtp(length) {
-    const otp = crypto
-        .randomInt(Math.pow(10, length - 1), Math.pow(10, length))
-        .toString();
-    return otp;
-}
-
-const createRide = async ({ user, pickup, destination, vehicleType }) => {
+const createRideService = async ({
+    user,
+    pickup,
+    destination,
+    vehicleType
+}) => {
     const fare = await getFare(pickup, destination);
     const otp = await getOtp(6);
     const ride = Ride.create({
@@ -70,7 +73,7 @@ const createRide = async ({ user, pickup, destination, vehicleType }) => {
     return ride;
 };
 
-const confirmRide = async ({ rideId, captain }) => {
+const confirmRideService = async ({ rideId, captain }) => {
     if (!rideId) {
         throw new apiError(400, "Invalid ride id");
     }
@@ -92,7 +95,7 @@ const confirmRide = async ({ rideId, captain }) => {
     return ride;
 };
 
-const startRide = async ({ rideId, otp, captain }) => {
+const startRideService = async ({ rideId, otp, captain }) => {
     if (!rideId) {
         throw new apiError(400, "Invalid ride id");
     }
@@ -130,7 +133,7 @@ const startRide = async ({ rideId, otp, captain }) => {
     return ride;
 };
 
-const endRide = async ({ rideId, captain }) => {
+const endRideService = async ({ rideId, captain }) => {
     if (!rideId) {
         throw new apiError(400, "Invalid ride id");
     }
@@ -160,4 +163,10 @@ const endRide = async ({ rideId, captain }) => {
     return ride;
 };
 
-export { createRide, getFare, confirmRide, startRide, endRide };
+export {
+    createRideService,
+    getFareService,
+    confirmRideService,
+    startRideService,
+    endRideService
+};
