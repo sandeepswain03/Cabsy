@@ -1,5 +1,5 @@
-import { get } from "mongoose";
 import apiError from "../utils/apiError.js";
+import { Captain } from "../models/captain.modal.js";
 import axios from "axios";
 
 const getAddressCoordinates = async (address) => {
@@ -92,4 +92,20 @@ const getSuggestionsForInput = async (input) => {
     }
 };
 
-export { getAddressCoordinates, getDistance, getSuggestionsForInput };
+const getcaptainInRadius = async (lng, ltd, radius) => {
+    const captains = await Captain.find({
+        location: {
+            $geoWithin: {
+                $centerSphere: [[ltd, lng], radius / 6371]
+            }
+        }
+    });
+    return captains;
+};
+
+export {
+    getAddressCoordinates,
+    getDistance,
+    getSuggestionsForInput,
+    getcaptainInRadius
+};
