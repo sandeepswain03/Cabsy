@@ -48,6 +48,7 @@ const initializeSocket = (server) => {
 
 const sendMessageToSocketId = (socketId, messageObject) => {
     if (io) {
+        // console.log(messageObject, socketId)
         io.to(socketId).emit(messageObject.event, messageObject.data);
     } else {
         console.log("⚠️ Socket.io not initialized.");

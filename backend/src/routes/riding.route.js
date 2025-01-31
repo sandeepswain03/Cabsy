@@ -4,7 +4,7 @@ import {
     confirmRide,
     startRide,
     endRide
-} from "../controllers/riding.route.js";
+} from "../controllers/riding.controller.js";
 import { body, query } from "express-validator";
 import { Router } from "express";
 
@@ -47,6 +47,7 @@ router.get(
 router.post(
     "/confirm",
     body("rideId").isMongoId().withMessage("Invalid ride id"),
+    body("captain").isObject().withMessage("Invalid captain object"),
     checkAuth,
     confirmRide
 );
@@ -64,6 +65,7 @@ router.get(
 router.post(
     "/end-ride",
     body("rideId").isMongoId().withMessage("Invalid ride id"),
+    body("captain").isObject().withMessage("Invalid captain object"),
     checkAuth,
     endRide
 );

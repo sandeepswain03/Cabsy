@@ -47,13 +47,12 @@ const createRide = asyncHandler(async (req, res) => {
         const rideWithUser = await Ride.findOne({ _id: ride._id }).populate(
             "user"
         );
-
-        // captainInRadius.map((captain) => {
-        //     sendMessageToSocketId(captain.socketId, {
-        //         event: "new-ride",
-        //         data: rideWithUser
-        //     });
-        // });
+        captainInRadius.map((captain) => {
+            sendMessageToSocketId(captain.socketId, {
+                event: "new-ride",
+                data: rideWithUser
+            });
+        });
     } catch (error) {
         throw new apiError(500, error.message || "Error creating ride");
     }
@@ -83,16 +82,15 @@ const confirmRide = asyncHandler(async (req, res) => {
         throw new apiError(400, "Validation Error", errors.array());
     }
 
-    const { rideId } = req.body;
+    const { rideId, captain } = req.body;
 
     try {
-        const ride = await confirmRideService({ rideId, captain: req.captain });
+        const ride = await confirmRideService({ rideId, captain: captain });
 
-        // sendMessageToSocketId(ride.user.socketId, {
-        //     event: "ride-confirmed",
-        //     data: ride
-        // });
-
+        sendMessageToSocketId(ride.user.socketId, {
+            event: "ride-confirmed",
+            data: ride
+        });
         return res.json(
             new apiResponse(200, ride, "Ride confirmed successfully", [])
         );
@@ -112,14 +110,13 @@ const startRide = asyncHandler(async (req, res) => {
     try {
         const ride = await startRideService({
             rideId,
-            otp,
-            captain: req.captain
+            otp
         });
 
-        // sendMessageToSocketId(ride.user.socketId, {
-        //     event: "ride-started",
-        //     data: ride
-        // });
+        sendMessageToSocketId(ride.user.socketId, {
+            event: "ride-started",
+            data: ride
+        });
 
         return res.json(
             new apiResponse(200, ride, "Ride started successfully", [])
@@ -135,15 +132,15 @@ const endRide = asyncHandler(async (req, res) => {
         throw new apiError(400, "Validation Error", errors.array());
     }
 
-    const { rideId } = req.body;
+    const { rideId, captain } = req.body;
 
     try {
-        const ride = await endRideService({ rideId, captain: req.captain });
+        const ride = await endRideService({ rideId, captain: captain });
 
-        // sendMessageToSocketId(ride.user.socketId, {
-        //     event: "ride-ended",
-        //     data: ride
-        // });
+        sendMessageToSocketId(ride.user.socketId, {
+            event: "ride-ended",
+            data: ride
+        });
 
         return res.json(
             new apiResponse(200, ride, "Ride ended successfully", [])

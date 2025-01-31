@@ -31,6 +31,7 @@ const Home = () => {
   const [activeField, setActiveField] = useState<'pickup' | 'destination' | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [fare, setFare] = useState({});
+  const [ride, setRide] = useState(null);
 
   const { watch, setValue } = useForm<FormInputs>();
   const navigate = useNavigate();
@@ -49,6 +50,17 @@ const Home = () => {
       });
     }
   }, [user]);
+
+  socket.on("ride-confirmed", (ride) => {
+    setRide(ride);
+    setLookingForDriver(false);
+    setDriverConfirmed(true);
+  });
+
+  socket.on("ride-started", (ride) => {
+    setDriverConfirmed(false);
+    navigate("/riding", { state: { ride } });
+  });
 
   useEffect(() => {
     const fetchSuggestions = async () => {
@@ -97,12 +109,11 @@ const Home = () => {
   };
 
   const createRide = async () => {
-    const response = await axiosInstance.post(`/riding/create`, {
+    await axiosInstance.post(`/riding/create`, {
       pickup: pickupLocation,
       destination: destination,
       vehicleType: selectedVehicle?.type
     });
-    console.log(response.data.data);
   }
 
   return (
@@ -264,6 +275,7 @@ const Home = () => {
         {driverConfirmed && (
           <DriverConfirmed
             driverName="John Doe"
+            ride={ride}
             vehicleName={selectedVehicle?.name || "car"}
             vehicleImage={selectedVehicle?.image || "/placeholder.svg"}
             onTrackRide={() => navigate("/riding")}

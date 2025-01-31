@@ -2,16 +2,15 @@ import { homemap } from "@/assets/map";
 import { motion } from "framer-motion";
 import { useState, useContext, useEffect } from "react";
 import RidePopup from "@/components/Home/RidePopup";
-import { useNavigate } from "react-router-dom";
 import { CaptainContext } from "@/context/CaptainContext";
 import { SocketContext } from "@/context/SocketContext";
+import { axiosInstance } from "@/axiosInstance";
 
 const CaptainHome = () => {
   const [earnings, setEarnings] = useState(295.20);
   const [hoursOnline, setHoursOnline] = useState(10.2);
-  const [showRidePopup, setShowRidePopup] = useState(true);
-
-  const navigate = useNavigate();
+  const [showRidePopup, setShowRidePopup] = useState(false);
+  const [ride, setRide] = useState(null)
 
   const { captain } = useContext(CaptainContext);
   const { socket } = useContext(SocketContext);
@@ -32,7 +31,7 @@ const CaptainHome = () => {
                 ltd: position.coords.latitude,
                 lng: position.coords.longitude
               }
-             
+
             });
           });
 
@@ -43,13 +42,21 @@ const CaptainHome = () => {
     }
   }, [captain]);
 
+  socket.on("new-ride", (data) => {
+    setRide(data)
+    setShowRidePopup(true);
+  });
+
+  const acceptRide = async () => {
+    if (!ride) return;
+    await axiosInstance.post(`/riding/confirm`, {
+      rideId: ride._id,
+      captain: captain
+    });
+  }
+
   const handleCloseRidePopup = () => {
     setShowRidePopup(false);
-  };
-
-  const handleAcceptRide = () => {
-    setShowRidePopup(false);
-    navigate("/captain-riding");
   };
 
   return (
@@ -117,8 +124,9 @@ const CaptainHome = () => {
 
       <RidePopup
         isOpen={showRidePopup}
+        acceptRide={acceptRide}
+        ride={ride}
         onClose={handleCloseRidePopup}
-        onAccept={handleAcceptRide}
       />
     </div>
   );

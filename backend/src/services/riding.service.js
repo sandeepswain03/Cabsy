@@ -74,8 +74,8 @@ const createRideService = async ({
 };
 
 const confirmRideService = async ({ rideId, captain }) => {
-    if (!rideId) {
-        throw new apiError(400, "Invalid ride id");
+    if (!rideId && !captain) {
+        throw new apiError(400, "Invalid ride id or captain");
     }
 
     await Ride.findByIdAndUpdate(
@@ -95,7 +95,7 @@ const confirmRideService = async ({ rideId, captain }) => {
     return ride;
 };
 
-const startRideService = async ({ rideId, otp, captain }) => {
+const startRideService = async ({ rideId, otp }) => {
     if (!rideId) {
         throw new apiError(400, "Invalid ride id");
     }

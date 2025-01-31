@@ -1,16 +1,30 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { homemap } from "@/assets/map";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { MapPin, Clock, DollarSign } from "lucide-react";
+import { CaptainContext } from "@/context/CaptainContext";
+import { axiosInstance } from "@/axiosInstance";
 
 const CaptainRiding = () => {
     const [showDetails, setShowDetails] = useState(false);
     const navigate = useNavigate();
+    const location = useLocation();
+    const rideData = location.state?.ride;
+    console.log(rideData);
+    const { captain } = useContext(CaptainContext);
 
-    const handleFinishRide = () => {
-        navigate("/captain-home");
+    const handleFinishRide = async () => {
+        try {
+            await axiosInstance.post("/riding/end-ride", {
+                rideId: rideData._id,
+                captain: captain
+            });
+            navigate("/captain-home");
+        } catch (error) {
+            console.error("Error ending ride:", error);
+        }
     };
 
     return (
@@ -40,9 +54,9 @@ const CaptainRiding = () => {
                 }}
             >
                 <motion.div
-                    className="bg-white rounded-t-2xl flex flex-col shadow-lg"
+                    className="bg-white rounded-t-2xl flex flex-col"
                     animate={{
-                        height: showDetails ? "60%" : "20%",
+                        height: showDetails ? "60%" : "12%",
                     }}
                     transition={{
                         type: "spring",
@@ -51,72 +65,85 @@ const CaptainRiding = () => {
                     }}
                 >
                     {!showDetails ? (
-                        <div className="p-5 space-y-4">
+                        <div className="p-4 space-y-1">
                             <div className="flex justify-between items-center">
                                 <div>
-                                    <h4 className="text-lg font-semibold">Current Ride</h4>
-                                    <p className="text-sm text-gray-500">2.2 km remaining</p>
+                                    <h4 className="text-base font-semibold">Current Ride</h4>
+                                    <p className="text-xs text-gray-500">In Progress</p>
                                 </div>
                                 <Button
                                     onClick={() => setShowDetails(true)}
-                                    className="bg-green-600 hover:bg-green-700 text-white"
+                                    className="bg-green-600 hover:bg-green-700 text-white text-sm py-1"
                                 >
                                     Finish Ride
                                 </Button>
                             </div>
                         </div>
                     ) : (
-                        <div className="p-5 space-y-6">
-                            <h3 className="text-2xl font-semibold">Ride Details</h3>
+                        <div className="p-4 space-y-4 h-full flex flex-col">
+                            <h3 className="text-xl font-semibold">Ride Details</h3>
 
-                            <div className="space-y-4">
-                                <div className="flex items-center gap-3">
-                                    <Clock className="w-5 h-5 text-gray-500" />
+                            <div className="bg-yellow-50 rounded-lg p-3 flex items-center gap-2">
+                                <div className="h-10 w-10 rounded-full bg-yellow-200 flex items-center justify-center text-yellow-700 font-bold text-lg">
+                                    {rideData?.user?.fullname?.firstname?.[0]?.toUpperCase()}
+                                </div>
+                                <div>
+                                    <h4 className="font-medium capitalize text-sm">
+                                        {rideData?.user?.fullname?.firstname} {rideData?.user?.fullname?.lastname}
+                                    </h4>
+                                    <p className="text-xs text-gray-600">{rideData?.user?.email}</p>
+                                </div>
+                            </div>
+
+                            <div className="space-y-3 flex-grow">
+                                <div className="flex items-center gap-2">
+                                    <Clock className="w-4 h-4 text-gray-500" />
                                     <div>
-                                        <p className="text-sm text-gray-500">Duration</p>
-                                        <p className="font-medium">25 mins</p>
+                                        <p className="text-xs text-gray-500">Started At</p>
+                                        <p className="text-sm font-medium">{new Date(rideData?.createdAt).toLocaleTimeString()}</p>
                                     </div>
                                 </div>
 
-                                <div className="flex items-center gap-3">
-                                    <DollarSign className="w-5 h-5 text-gray-500" />
+                                <div className="flex items-center gap-2">
+                                    <DollarSign className="w-4 h-4 text-gray-500" />
                                     <div>
-                                        <p className="text-sm text-gray-500">Fare</p>
-                                        <p className="font-medium">₹193.20</p>
+                                        <p className="text-xs text-gray-500">Fare</p>
+                                        <p className="text-sm font-medium">₹{rideData?.fare}</p>
                                     </div>
                                 </div>
 
                                 <div className="space-y-2">
-                                    <div className="flex items-start gap-3">
-                                        <MapPin className="w-5 h-5 text-gray-500 mt-1" />
+                                    <div className="flex items-start gap-2">
+                                        <MapPin className="w-4 h-4 text-gray-500 mt-1" />
                                         <div>
-                                            <p className="text-sm text-gray-500">Pickup</p>
-                                            <p className="font-medium">Kankariya Talab, Bhopal</p>
+                                            <p className="text-xs text-gray-500">Pickup</p>
+                                            <p className="text-sm font-medium">{rideData?.pickup}</p>
                                         </div>
                                     </div>
 
-                                    <div className="flex items-start gap-3">
-                                        <MapPin className="w-5 h-5 text-gray-500 mt-1" />
+                                    <div className="flex items-start gap-2">
+                                        <MapPin className="w-4 h-4 text-gray-500 mt-1" />
                                         <div>
-                                            <p className="text-sm text-gray-500">Drop-off</p>
-                                            <p className="font-medium">MP Nagar, Bhopal</p>
+                                            <p className="text-xs text-gray-500">Drop-off</p>
+                                            <p className="text-sm font-medium">{rideData?.destination}</p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4 pt-4">
+                            <div className="flex gap-2">
                                 <Button
                                     variant="outline"
                                     onClick={() => setShowDetails(false)}
+                                    className="text-sm flex-1"
                                 >
-                                    Cancel
+                                    Back
                                 </Button>
                                 <Button
-                                    className="bg-green-600 hover:bg-green-700 text-white"
+                                    className="bg-green-600 hover:bg-green-700 text-white text-sm flex-1"
                                     onClick={handleFinishRide}
                                 >
-                                    Confirm Finish
+                                    Complete Ride
                                 </Button>
                             </div>
                         </div>

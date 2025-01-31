@@ -3,29 +3,58 @@ import { MapPin } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { axiosInstance } from "@/axiosInstance";
+import { useNavigate } from "react-router-dom";
 
 interface RidePopupProps {
     isOpen: boolean;
+    ride: {
+        _id: string;
+        pickup: string;
+        destination: string;
+        fare: number;
+        status: string;
+        user: {
+            fullname: {
+                firstname: string;
+                lastname: string;
+            };
+            email: string;
+        };
+        createdAt: string;
+    };
+    acceptRide: () => void;
     onClose: () => void;
-    onAccept: () => void;
 }
 
 const RidePopup: React.FC<RidePopupProps> = ({
     isOpen,
+    ride,
+    acceptRide,
     onClose,
-    onAccept,
 }) => {
     const [showOtp, setShowOtp] = useState(false);
     const [otp, setOtp] = useState("");
+    const navigate = useNavigate();
 
     const handleAccept = () => {
+        acceptRide();
         setShowOtp(true);
     };
 
-    const handleConfirm = () => {
+    const handleConfirm = async () => {
         if (otp) {
-            onAccept();
-            setShowOtp(false);
+            try {
+                const response = await axiosInstance.get(`/riding/start-ride?rideId=${ride._id}&otp=${otp}`);
+
+                if (response.status === 200) {
+                    navigate('/captain-riding', { state: { ride: ride } });
+                    setShowOtp(false);
+                    onClose();
+                }
+            } catch (error) {
+                console.error("Error starting ride:", error);
+            }
         }
     };
 
@@ -54,44 +83,47 @@ const RidePopup: React.FC<RidePopupProps> = ({
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.2 }}
                 >
-                    <h3 className="text-xl font-semibold">New Ride Available!</h3>
+                    <div className="flex justify-between items-center">
+                        <h3 className="text-xl font-semibold">New Ride Request!</h3>
+                        <span className="text-sm text-gray-500">
+                            {new Date(ride?.createdAt).toLocaleTimeString()}
+                        </span>
+                    </div>
 
-                    <div className="bg-yellow-100 rounded-xl p-4 flex items-center gap-3">
-                        <div className="h-12 w-12 rounded-full bg-gray-300 overflow-hidden">
-                            <img
-                                src="/placeholder.svg"
-                                alt="Customer"
-                                className="h-full w-full object-cover"
-                            />
+                    <div className="bg-yellow-50 rounded-xl p-4 flex items-center gap-3">
+                        <div className="h-12 w-12 rounded-full bg-yellow-200 flex items-center justify-center text-yellow-700 font-bold text-xl">
+                            {ride?.user?.fullname?.firstname?.[0]?.toUpperCase()}
                         </div>
                         <div>
-                            <h4 className="font-medium">Harshi Pateliya</h4>
-                            <p className="text-sm text-gray-600">2.2 KM</p>
+                            <h4 className="font-medium capitalize">
+                                {ride?.user?.fullname?.firstname} {ride?.user?.fullname?.lastname}
+                            </h4>
+                            <p className="text-sm text-gray-600">{ride?.user?.email}</p>
                         </div>
                     </div>
 
-                    <div className="space-y-3">
+                    <div className="space-y-3 bg-gray-50 p-4 rounded-xl">
                         <div className="flex items-start gap-3">
-                            <MapPin className="h-5 w-5 text-gray-500 mt-1" />
+                            <MapPin className="h-6 w-6 text-green-600 mt-1" />
                             <div>
-                                <p className="font-medium">562/11-A</p>
-                                <p className="text-sm text-gray-600">Kankariya Talab, Bhopal</p>
+                                <p className="text-sm text-gray-500">Pickup Location</p>
+                                <p className="font-medium text-xs">{ride?.pickup}</p>
                             </div>
                         </div>
 
-                        <div className="flex items-start gap-3">
-                            <MapPin className="h-5 w-5 text-gray-500 mt-1" />
+                        <div className="flex items-start justify-between gap-3">
+                            <MapPin className="h-4 w-4 text-red-600 mt-1" />
                             <div>
-                                <p className="font-medium">562/11-A</p>
-                                <p className="text-sm text-gray-600">Kankariya Talab, Bhopal</p>
+                                <p className="text-sm text-gray-500">Drop Location</p>
+                                <p className="font-medium text-xs">{ride?.destination}</p>
                             </div>
                         </div>
                     </div>
 
-                    <div className="flex items-center justify-between py-2">
+                    <div className="flex items-center justify-between py-2 bg-green-50 px-4 rounded-xl">
                         <div className="flex items-center gap-2">
-                            <span className="text-lg font-semibold">₹193.20</span>
-                            <span className="text-sm text-gray-600">Cash Cash</span>
+                            <span className="text-2xl font-bold text-green-700">₹{ride?.fare}</span>
+                            <span className="text-sm text-gray-600">Estimated Fare</span>
                         </div>
                     </div>
 
@@ -100,13 +132,13 @@ const RidePopup: React.FC<RidePopupProps> = ({
                             onClick={handleAccept}
                             className="w-full py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors"
                         >
-                            Accept
+                            Accept Ride
                         </button>
                         <button
                             onClick={onClose}
                             className="w-full py-3 bg-gray-200 text-gray-800 font-medium rounded-lg hover:bg-gray-300 transition-colors"
                         >
-                            Ignore
+                            Decline
                         </button>
                     </div>
                 </motion.div>
@@ -119,10 +151,11 @@ const RidePopup: React.FC<RidePopupProps> = ({
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.2 }}
                 >
-                    <h3 className="text-xl font-semibold">Enter OTP</h3>
+                    <h3 className="text-xl font-semibold">Verify OTP</h3>
+                    <p className="text-sm text-gray-600">Enter the OTP sent to passenger</p>
                     <Input
                         type="text"
-                        placeholder="Enter OTP"
+                        placeholder="Enter 6-digit OTP"
                         value={otp}
                         onChange={(e) => setOtp(e.target.value)}
                         className="text-center text-lg"
@@ -131,16 +164,16 @@ const RidePopup: React.FC<RidePopupProps> = ({
                     <div className="grid grid-cols-2 gap-3">
                         <Button
                             onClick={handleConfirm}
-                            className="w-full bg-green-600 hover:bg-green-700"
+                            className="w-full bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg"
                         >
-                            Confirm
+                            Verify & Start
                         </Button>
                         <Button
                             onClick={handleReject}
                             variant="secondary"
-                            className="w-full"
+                            className="w-full "
                         >
-                            Reject
+                            Cancel
                         </Button>
                     </div>
                 </motion.div>

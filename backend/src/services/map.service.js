@@ -9,12 +9,11 @@ const getAddressCoordinates = async (address) => {
             address
         )}&key=${apikey}`
     );
-    console.log(response);
     try {
         if (response.data.status === "OK") {
             const location = response.data.results[0].geometry.location;
             return {
-                lat: location.lat,
+                ltd: location.lat,
                 lng: location.lng
             };
         } else {
@@ -41,7 +40,6 @@ const getDistance = async (origin, destination) => {
             origin
         )}&destinations=${encodeURIComponent(destination)}&key=${apikey}`
     );
-    console.log(response);
     try {
         if (response.data.status === "OK") {
             return response.data.rows[0].elements[0];
@@ -96,9 +94,9 @@ const getcaptainInRadius = async (lng, ltd, radius) => {
     const captains = await Captain.find({
         location: {
             $geoWithin: {
-                $centerSphere: [[ltd, lng], radius / 6371]
+                $centerSphere: [[lng, ltd], radius / 6371]
             }
-        }
+        },
     });
     return captains;
 };
