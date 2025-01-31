@@ -1,11 +1,11 @@
 import { useContext, useState } from "react";
-import { homemap } from "@/assets/map";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MapPin, Car, House } from "lucide-react";
 import { motion } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
 import { SocketContext } from "@/context/SocketContext";
+import LiveTracking from "@/components/LiveTracking";
 
 const PANEL_ANIMATION = {
   type: "spring",
@@ -39,11 +39,7 @@ const Riding = () => {
         </div>
       </header>
       <div className="h-screen w-screen overflow-hidden">
-        <img
-          src={homemap}
-          alt="Map view"
-          className="h-full w-full object-cover"
-        />
+        <LiveTracking />
       </div>
       <motion.div
         className="absolute inset-x-0 flex flex-col justify-end h-screen"

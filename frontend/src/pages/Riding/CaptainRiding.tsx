@@ -1,11 +1,11 @@
 import { useContext, useState } from "react";
-import { homemap } from "@/assets/map";
 import { motion } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { MapPin, Clock, DollarSign } from "lucide-react";
 import { CaptainContext } from "@/context/CaptainContext";
 import { axiosInstance } from "@/axiosInstance";
+import LiveTracking from "@/components/LiveTracking";
 
 const CaptainRiding = () => {
     const [showDetails, setShowDetails] = useState(false);
@@ -34,11 +34,7 @@ const CaptainRiding = () => {
             </p>
 
             <div className="h-screen w-screen overflow-hidden">
-                <img
-                    src={homemap || "/placeholder.svg"}
-                    alt="homemap"
-                    className="h-full w-full object-cover"
-                />
+                <LiveTracking />
             </div>
 
             <motion.div

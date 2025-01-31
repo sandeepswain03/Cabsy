@@ -1,10 +1,10 @@
-import { homemap } from "@/assets/map";
 import { motion } from "framer-motion";
 import { useState, useContext, useEffect } from "react";
 import RidePopup from "@/components/Home/RidePopup";
 import { CaptainContext } from "@/context/CaptainContext";
 import { SocketContext } from "@/context/SocketContext";
 import { axiosInstance } from "@/axiosInstance";
+import LiveTracking from "@/components/LiveTracking";
 
 const CaptainHome = () => {
   const [earnings, setEarnings] = useState(295.20);
@@ -66,11 +66,7 @@ const CaptainHome = () => {
       </p>
 
       <div className="h-screen w-screen overflow-hidden">
-        <img
-          src={homemap || "/placeholder.svg"}
-          alt="homemap"
-          className="h-full w-full object-cover"
-        />
+        <LiveTracking />
       </div>
 
       <motion.div

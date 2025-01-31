@@ -1,5 +1,4 @@
 import { useState, useEffect, useContext } from "react";
-import { homemap } from "@/assets/map";
 import { useForm } from "react-hook-form";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowDown } from "lucide-react";
@@ -14,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { axiosInstance } from "@/axiosInstance";
 import { SocketContext } from "@/context/SocketContext";
 import { UserContext } from "@/context/UserContext";
+import LiveTracking from "@/components/LiveTracking";
 
 interface FormInputs {
   pickupLocation: string;
@@ -123,11 +123,7 @@ const Home = () => {
       </p>
 
       <div className="h-screen w-screen overflow-hidden">
-        <img
-          src={homemap}
-          alt="map"
-          className="h-full w-full object-cover"
-        />
+        <LiveTracking />
       </div>
 
       <motion.div
