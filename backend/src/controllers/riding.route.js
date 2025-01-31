@@ -2,7 +2,7 @@ import apiError from "../utils/apiError.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import apiResponse from "../utils/apiResponse.js";
 import { validationResult } from "express-validator";
-// import { sendMessageToSocketId } from "../utils/socket.js";
+import { sendMessageToSocketId } from "../socket.js";
 import { Ride } from "../models/ride.modal.js";
 import {
     createRideService,

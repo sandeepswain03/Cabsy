@@ -4,6 +4,7 @@ import "./index.css";
 import App from "./App.tsx";
 import { UserContextProvider } from "./context/UserContext.tsx";
 import { CaptainContextProvider } from "./context/CaptainContext.tsx";
+import { SocketProvider } from "./context/SocketContext.tsx";
 import { BrowserRouter as Router } from "react-router-dom";
 
 createRoot(document.getElementById("root")!).render(
@@ -11,7 +12,9 @@ createRoot(document.getElementById("root")!).render(
     <Router>
       <CaptainContextProvider>
         <UserContextProvider>
-          <App />
+          <SocketProvider>
+            <App />
+          </SocketProvider>
         </UserContextProvider>
       </CaptainContextProvider>
     </Router>

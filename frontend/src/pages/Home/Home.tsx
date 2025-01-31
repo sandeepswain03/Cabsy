@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { homemap } from "@/assets/map";
 import { useForm } from "react-hook-form";
 import { motion, AnimatePresence } from "framer-motion";
@@ -12,6 +12,8 @@ import DriverConfirmed from "@/components/Home/DriverConfirmed";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { axiosInstance } from "@/axiosInstance";
+import { SocketContext } from "@/context/SocketContext";
+import { UserContext } from "@/context/UserContext";
 
 interface FormInputs {
   pickupLocation: string;
@@ -33,8 +35,20 @@ const Home = () => {
   const { watch, setValue } = useForm<FormInputs>();
   const navigate = useNavigate();
 
+  const { socket } = useContext(SocketContext);
+  const { user } = useContext(UserContext);
+
   const pickupLocation = watch("pickupLocation");
   const destination = watch("destination");
+
+  useEffect(() => {
+    if (user) {
+      socket.emit("join", {
+        userId: user._id,
+        userType: "user"
+      });
+    }
+  }, [user]);
 
   useEffect(() => {
     const fetchSuggestions = async () => {

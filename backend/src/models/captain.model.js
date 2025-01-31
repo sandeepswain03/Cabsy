@@ -30,7 +30,7 @@ const captainSchema = new Schema(
             type: String,
             required: [true, "Password is required"]
         },
-        soketId: {
+        socketId: {
             type: String
         },
         refreshToken: {

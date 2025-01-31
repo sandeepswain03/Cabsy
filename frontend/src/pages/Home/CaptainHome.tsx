@@ -1,14 +1,47 @@
-import { useState } from "react";
 import { homemap } from "@/assets/map";
 import { motion } from "framer-motion";
+import { useState, useContext, useEffect } from "react";
 import RidePopup from "@/components/Home/RidePopup";
 import { useNavigate } from "react-router-dom";
+import { CaptainContext } from "@/context/CaptainContext";
+import { SocketContext } from "@/context/SocketContext";
 
 const CaptainHome = () => {
   const [earnings, setEarnings] = useState(295.20);
   const [hoursOnline, setHoursOnline] = useState(10.2);
   const [showRidePopup, setShowRidePopup] = useState(true);
+
   const navigate = useNavigate();
+
+  const { captain } = useContext(CaptainContext);
+  const { socket } = useContext(SocketContext);
+
+  useEffect(() => {
+    if (captain) {
+      socket.emit("join", {
+        userId: captain._id,
+        userType: "captain"
+      });
+
+      const updateLocation = () => {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition((position) => {
+            socket.emit("update-location-captain", {
+              userId: captain._id,
+              location: {
+                ltd: position.coords.latitude,
+                lng: position.coords.longitude
+              }
+             
+            });
+          });
+
+        }
+      }
+      setInterval(updateLocation, 10000)
+      updateLocation();
+    }
+  }, [captain]);
 
   const handleCloseRidePopup = () => {
     setShowRidePopup(false);
@@ -59,7 +92,7 @@ const CaptainHome = () => {
             <div className="flex items-center gap-3 mb-6">
               <div className="w-12 h-12 rounded-full bg-gray-200" />
               <div>
-                <h4 className="text-xl font-semibold">Harsh Patel</h4>
+                <h4 className="text-xl font-semibold">{captain?.fullname?.firstname} {captain?.fullname?.lastname}</h4>
                 <p className="text-gray-600">₹{earnings} Earned</p>
               </div>
             </div>

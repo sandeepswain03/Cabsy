@@ -9,17 +9,22 @@ const Index = () => {
   const navigate = useNavigate();
   const { user } = useContext(UserContext);
   const { captain } = useContext(CaptainContext);
+  console.log(user, captain);
 
   const handleSplashComplete = () => {
-    if (user || captain) {
+    if (user) {
       navigate("/home");
-    } else {
+    }
+    else if (captain) {
+      navigate("/captain-home");
+    }
+    else {
       navigate("/sign-in");
     }
   };
 
   useEffect(() => {
-    return () => {};
+    return () => { };
   }, []);
 
   return (

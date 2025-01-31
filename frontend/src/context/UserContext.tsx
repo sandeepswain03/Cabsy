@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { axiosInstance, setupAxiosInterceptors } from "../axiosInstance";
 
 interface User {
-  id?: string;
+  _id?: string;
   fullname?: {
     firstname: string;
     lastname: string;
